@@ -15,6 +15,7 @@ U# Timesheet extracter
   - openpyxl==3.0.5
   - pandas==1.1.4
   - python-dateutil==2.8.1
+  - python-dotenv==0.15.0
   - pytz==2020.4
   - six==1.15.0
   - xlrd==1.2.0

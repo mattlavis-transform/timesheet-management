@@ -2,6 +2,8 @@ import pandas as pd
 import openpyxl
 import csv
 import sys
+import os
+from dotenv import load_dotenv
 from os import system, name
 from datetime import date, datetime
 from openpyxl.styles import Font, Fill, PatternFill  # Connect styles for text
@@ -14,7 +16,8 @@ from sow import sow
 
 
 class application(object):
-    def __init__(self):
+    def __init__(self, source_file):
+        self.source_file = source_file
         self.src = ""
         self.sheet = "Sheet1"
         self.dest = ""
@@ -35,13 +38,20 @@ class application(object):
         self.get_project()
         self.get_timesheet_month()
 
+    def get_config(self):
+        load_dotenv('.env')
+        self.source_path = os.getenv('SOURCE_PATH')
+        self.src = os.path.join(self.source_path, self.source_file)
+        self.master = os.path.join(
+            self.source_path, "HMRC billing master.xlsx")
+
     def clear(self):
         # for windows
         if name == 'nt':
             _ = system('cls')
         else:
             _ = system("printf '\33c\e[3J'")
-            
+
     def get_project(self):
         if (len(sys.argv) > 1):
             self.project_id = sys.argv[1]
@@ -164,6 +174,11 @@ class application(object):
             self.format_columns(sheet)
             self.create_pivot_sheets(wb)
 
+            # Make the dest folder
+            dest = "dest"
+            if not os.path.isdir(dest):
+                os.mkdir(dest)
+
             # Save the file
             if self.timesheet_month != "":
                 self.filename = "dest/" + self.project_id + \
@@ -272,7 +287,8 @@ class application(object):
                                values='Hours (fixed)', aggfunc='sum', fill_value='0', margins=False)
         print(pivot)
 
-        pivot = pd.pivot_table(df, index='Resource name', columns='Month', values='Charge amount', aggfunc='sum', fill_value='0', margins = True)
+        pivot = pd.pivot_table(df, index='Resource name', columns='Month',
+                               values='Charge amount', aggfunc='sum', fill_value='0', margins=True)
         print(pivot)
         return
 
@@ -297,7 +313,6 @@ class application(object):
                     self.get_master_row(row)
 
                 line_count += 1
-
 
     def get_master_top_row(self, row):
         my_resource = None

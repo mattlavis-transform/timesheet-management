@@ -5,9 +5,8 @@ import sys
 from application import application
 
 global app
-app = application()
-app.src = "/Users/matt.admin/OneDrive - The Engine Group/clients/Future Borders/HMRC timesheets/HMRC - November 201124.xlsx"
-app.master = "/Users/matt.admin/OneDrive - The Engine Group/clients/Future Borders/HMRC timesheets/HMRC billing master.xlsx"
+app = application("HMRC - November 201124.xlsx")
+app.get_config()
 
 app.clear()
 app.convert_excel()
