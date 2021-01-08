@@ -172,7 +172,7 @@ class application(object):
                             start_color="FFFF99", end_color="FFFF99", fill_type="solid")
 
             self.format_columns(sheet)
-            self.create_pivot_sheets(wb)
+            # self.create_pivot_sheets(wb)
 
             # Make the dest folder
             dest = "dest"
@@ -187,7 +187,7 @@ class application(object):
                 self.filename = "dest/" + self.project_id + ".xlsx"
             wb.save(self.filename)
 
-            self.write_pivots()
+            # self.write_pivots()
 
     def format_columns(self, sheet):
         column_widths = [15, 20, 15, 15, 15, 15, 20, 15, 15, 15, 20, 20]
