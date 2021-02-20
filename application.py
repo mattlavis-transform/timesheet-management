@@ -16,10 +16,8 @@ from sow import sow
 
 
 class application(object):
-    def __init__(self, source_file):
-        self.source_file = source_file
+    def __init__(self):
         self.src = ""
-        self.sheet = "Sheet1"
         self.dest = ""
         self.master_dest = ""
         self.master_sheet = ""
@@ -31,7 +29,6 @@ class application(object):
 
         self.permitted_employee = [1.875, 3.75, 5.625, 7.5]
         self.permitted_contractor = [2, 4, 6, 8]
-        self.sht = "Sheet1"
         self.dest = 'src/temp.csv'
         self.master_dest = 'src/temp_master.csv'
 
@@ -40,7 +37,11 @@ class application(object):
 
     def get_config(self):
         load_dotenv('.env')
+
         self.source_path = os.getenv('SOURCE_PATH')
+        self.source_file = os.getenv('SOURCE_FILE')
+        self.sheet = os.getenv('SHEET')
+
         self.src = os.path.join(self.source_path, self.source_file)
         self.master = os.path.join(
             self.source_path, "HMRC billing master.xlsx")
@@ -57,16 +58,19 @@ class application(object):
             self.project_id = sys.argv[1]
             if self.project_id.lower() in ("sf", "smartfreight", "smart_freight"):
                 self.project_id = "TRN.HMR10052"
-                self.master_sheet = "Smart Freight - HMRC"
+                self.master_sheet = "Smart Freight"
             elif self.project_id.lower() in ("ott", "tariff"):
                 self.project_id = "TRN.HMR11896"
-                self.master_sheet = "STW - HMRC"
+                self.master_sheet = "OTT"
+            elif self.project_id.lower() in ("sf_support", "support"):
+                self.project_id = "TRN.HMR12175"
+                self.master_sheet = "SF_SUPPORT"
             else:
                 self.project_id = "TRN.HMR10142"
-                self.master_sheet = "STW - HMRC"
+                self.master_sheet = "STW"
         else:
             self.project_id = "TRN.HMR10052"
-            self.master_sheet = "Smart Freight - HMRC"
+            self.master_sheet = "Smart Freight"
 
     def get_timesheet_month(self):
         if (len(sys.argv) > 2):
@@ -151,11 +155,11 @@ class application(object):
                 sheet.cell(row=index, column=2).value = entry.resource_name
                 sheet.cell(row=index, column=3).value = entry.resource_type
                 sheet.cell(
-                    row=index, column=4).value = entry.day_date_formatted
+                    row=index, column=4).value = str(entry.day_date_formatted).replace(" 00:00:00", "")
                 sheet.cell(row=index, column=5).value = entry.day_of_week
                 sheet.cell(row=index, column=6).value = entry.month
                 sheet.cell(
-                    row=index, column=7).value = entry.timesheet_period_formatted
+                    row=index, column=7).value = str(entry.timesheet_period_formatted).replace(" 00:00:00", "")
                 sheet.cell(row=index, column=8).value = entry.day_rate
                 sheet.cell(row=index, column=9).value = entry.hours
                 sheet.cell(row=index, column=10).value = entry.hours_fixed
