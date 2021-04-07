@@ -22,12 +22,11 @@ U# Timesheet extracter
 
   via `pip3 install -r requirements.txt`
 
-
 ## Usage
 
 To extract only the relevant information from the full timesheet document:
 
-`python3 main.py stw january full`
-`python3 main.py smartfreight january full`
-`python3 main.py sf_support january full`
-`python3 main.py ott january full`
+`python3 main.py stw march full`
+`python3 main.py smartfreight march full`
+`python3 main.py sf_support march full`
+`python3 main.py ott march full`
