@@ -21,6 +21,12 @@ class timesheet_entry(object):
         self.resource = None
         self.sow_id = ""
         self.mark_for_deletion = False
+        
+    def get_hmrc_hours(self):
+        if self.resource_type == "Employee":
+            self.hours_hmrc = self.hours_fixed * (8 / 7.5)
+        else:
+            self.hours_hmrc = self.hours_fixed
 
     def cost(self):
         if self.resource_type == "Employee":
@@ -31,7 +37,7 @@ class timesheet_entry(object):
                 sys.exit()
 
         else:
-            # print (str(self.resource_name))
+            # print (str(self.resource_name), str(self.hours_fixed), str(self.day_rate))
             s = self.hours_fixed * self.day_rate / 8
         return s
 
@@ -45,6 +51,7 @@ class timesheet_entry(object):
 
         self.day_of_week = self.day_date_as_date.strftime("%A")
         self.month = self.day_date_as_date.strftime("%B")
+        self.year = self.day_date_as_date.strftime("%Y")
 
         try:
             date_time_obj = datetime.strptime(self.timesheet_period, '%Y-%m-%d %H:%M:%S')

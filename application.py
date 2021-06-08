@@ -105,6 +105,7 @@ class application(object):
 
                     if entry.project_id == self.project_id:
                         entry.fix_hours()
+                        entry.get_hmrc_hours()
                         entry.process_date()
                         entry.get_day_rate(self.resources)
                         entry.get_sow(self.sows)
@@ -112,8 +113,9 @@ class application(object):
                         if self.timesheet_month == "":
                             self.entries.append(entry)
                         else:
-                            if entry.month.lower() == self.timesheet_month:
-                                self.entries.append(entry)
+                            if entry.year == "2021":
+                                if entry.month.lower() == self.timesheet_month:
+                                    self.entries.append(entry)
 
                 line_count += 1
         self.combine_like_lines()
@@ -154,25 +156,24 @@ class application(object):
                 sheet.cell(row=index, column=1).value = entry.project_id
                 sheet.cell(row=index, column=2).value = entry.resource_name
                 sheet.cell(row=index, column=3).value = entry.resource_type
-                sheet.cell(
-                    row=index, column=4).value = str(entry.day_date_formatted).replace(" 00:00:00", "")
-                sheet.cell(row=index, column=5).value = entry.day_of_week
-                sheet.cell(row=index, column=6).value = entry.month
-                sheet.cell(
-                    row=index, column=7).value = str(entry.timesheet_period_formatted).replace(" 00:00:00", "")
-                sheet.cell(row=index, column=8).value = entry.day_rate
-                sheet.cell(row=index, column=9).value = entry.hours
-                sheet.cell(row=index, column=10).value = entry.hours_fixed
-                sheet.cell(row=index, column=11).value = entry.cost()
-                sheet.cell(row=index, column=12).value = entry.sow_id
+                sheet.cell(row=index, column=4).value = entry.hours
+                sheet.cell(row=index, column=5).value = entry.hours_fixed
+                sheet.cell(row=index, column=6).value = entry.hours_hmrc
+                sheet.cell(row=index, column=7).value = str(entry.day_date_formatted).replace(" 00:00:00", "")
+                sheet.cell(row=index, column=8).value = entry.day_of_week
+                sheet.cell(row=index, column=9).value = entry.month
+                sheet.cell(row=index, column=10).value = str(entry.timesheet_period_formatted).replace(" 00:00:00", "")
+                sheet.cell(row=index, column=11).value = entry.day_rate
+                sheet.cell(row=index, column=12).value = entry.cost()
+                sheet.cell(row=index, column=13).value = entry.sow_id
 
                 if entry.resource_type == "Employee":
                     if entry.hours_fixed not in self.permitted_employee:
-                        sheet.cell(row=index, column=10).fill = PatternFill(
+                        sheet.cell(row=index, column=5).fill = PatternFill(
                             start_color="FFFF99", end_color="FFFF99", fill_type="solid")
                 else:
                     if entry.hours_fixed not in self.permitted_contractor:
-                        sheet.cell(row=index, column=10).fill = PatternFill(
+                        sheet.cell(row=index, column=5).fill = PatternFill(
                             start_color="FFFF99", end_color="FFFF99", fill_type="solid")
 
             self.format_columns(sheet)
@@ -212,15 +213,16 @@ class application(object):
         sheet.cell(row=1, column=1).value = "Project ID"
         sheet.cell(row=1, column=2).value = "Resource name"
         sheet.cell(row=1, column=3).value = "Resource type"
-        sheet.cell(row=1, column=4).value = "Day"
-        sheet.cell(row=1, column=5).value = "Day of week"
-        sheet.cell(row=1, column=6).value = "Month"
-        sheet.cell(row=1, column=7).value = "Timesheet period (start)"
-        sheet.cell(row=1, column=8).value = "Day rate"
-        sheet.cell(row=1, column=9).value = "Hours"
-        sheet.cell(row=1, column=10).value = "Hours (fixed)"
-        sheet.cell(row=1, column=11).value = "Charge amount"
-        sheet.cell(row=1, column=12).value = "SOW ID"
+        sheet.cell(row=1, column=4).value = "Hours"
+        sheet.cell(row=1, column=5).value = "Hours (fixed)"
+        sheet.cell(row=1, column=6).value = "Hours (HMRC)"
+        sheet.cell(row=1, column=7).value = "Day"
+        sheet.cell(row=1, column=8).value = "Day of week"
+        sheet.cell(row=1, column=9).value = "Month"
+        sheet.cell(row=1, column=10).value = "Timesheet period (start)"
+        sheet.cell(row=1, column=11).value = "Day rate"
+        sheet.cell(row=1, column=12).value = "Charge amount"
+        sheet.cell(row=1, column=13).value = "SOW ID"
 
         sheet['A1'].font = Font(bold=True)
         sheet['B1'].font = Font(bold=True)
@@ -245,16 +247,17 @@ class application(object):
                 if line_count == 0:
                     pass
                 else:
-                    res = resource()
-                    res.project_id = row[0]
-                    res.resource_name = row[1]
-                    res.day_rate = int(row[2])
-                    res.resource_type = row[3]
-                    res.charge_under = row[4]
-                    res.get_hours_per_day()
-                    if res.charge_under == "":
-                        res.charge_under = res.resource_name
-                    self.resources.append(res)
+                    if len(row) > 1:
+                        res = resource()
+                        res.project_id = row[0]
+                        res.resource_name = row[1]
+                        res.day_rate = int(row[2])
+                        res.resource_type = row[3]
+                        res.charge_under = row[4]
+                        res.get_hours_per_day()
+                        if res.charge_under == "":
+                            res.charge_under = res.resource_name
+                        self.resources.append(res)
                 line_count += 1
 
     def get_sows(self):
