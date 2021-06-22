@@ -26,7 +26,7 @@ U# Timesheet extracter
 
 To extract only the relevant information from the full timesheet document:
 
-`python3 main.py stw april full`
-`python3 main.py smartfreight april full`
-`python3 main.py sf_support april full`
+`python3 main.py stw all full`
+`python3 main.py smartfreight all full`
+`python3 main.py sf_support all full`
 `python3 main.py ott april full`
